@@ -1,0 +1,20 @@
+apiVersion: telemetry.istio.io/v1
+kind: Telemetry
+metadata:
+  name: otel-demo
+  namespace: test-istio-v3
+spec:
+  tracing:
+    - providers:
+        - name: otel
+      randomSamplingPercentage: 100
+---
+apiVersion: telemetry.istio.io/v1
+kind: Telemetry
+metadata:
+  name: enable-prometheus-metrics
+  namespace: test-istio-v3
+spec:
+  metrics:
+    - providers:
+        - name: prometheus

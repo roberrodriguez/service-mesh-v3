@@ -1,0 +1,32 @@
+apiVersion: sailoperator.io/v1
+kind: Istio
+metadata:
+  name: test-istio-v3
+  namespace: test-istio-v3
+spec:
+  namespace: test-istio-v3
+  values:
+    pilot:
+      autoscaleMin: 2 
+      autoscaleMax: 5 
+      cpu:
+        targetAverageUtilization: 80 
+      memory:
+        targetAverageUtilization: 80 
+    meshConfig:
+      enableTracing: true
+      extensionProviders:
+      - name: otel
+        opentelemetry:
+          port: 4317
+          service: otel-collector.test-istio-v3.svc.cluster.local 
+      discoverySelectors:
+        - matchLabels:
+            mesh: test-istio-v3
+---
+apiVersion: sailoperator.io/v1
+kind: IstioCNI
+metadata:
+  name: default
+spec:
+  namespace: istio-cni
