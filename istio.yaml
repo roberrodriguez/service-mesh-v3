@@ -2,7 +2,6 @@ apiVersion: sailoperator.io/v1
 kind: Istio
 metadata:
   name: test-istio-v3
-  namespace: test-istio-v3
 spec:
   namespace: test-istio-v3
   values:
@@ -20,9 +19,9 @@ spec:
         opentelemetry:
           port: 4317
           service: otel-collector.test-istio-v3.svc.cluster.local 
-      discoverySelectors:
-        - matchLabels:
-            mesh: test-istio-v3
+      # discoverySelectors:
+      #   - matchLabels:
+      #       mesh: test-istio-v3
 ---
 apiVersion: sailoperator.io/v1
 kind: IstioCNI

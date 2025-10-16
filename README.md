@@ -14,8 +14,15 @@ oc create ns istio-cni
 oc create ns bookinfo
 oc create ns istio-tempo
 
+oc label namespace bookinfo mesh=test-istio-v3 
+oc label namespace bookinfo istio.io/rev=test-istio-v3
+
 oc apply -f tempo-stack
 oc apply -f istio.yaml
 oc apply -f otel-collector.yaml
-oc apply -f tempo-rolebinding.yaml
+oc apply -f tempo-rolebindings.yaml
 oc apply -f telemetry.yaml
+
+oc apply -f https://raw.githubusercontent.com/openshift-service-mesh/istio/release-1.24/samples/bookinfo/platform/kube/bookinfo.yaml -n bookinfo
+
+oc -n bookinfo expose svc/productpage
