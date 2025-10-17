@@ -5,7 +5,8 @@ metadata:
   namespace: test-istio-v3
 spec:
   observability:
-    metrics: {}
+    metrics:
+      enableMetrics: true
   deploymentUpdateStrategy: {}
   config:
     exporters:
