@@ -14,7 +14,6 @@ oc create ns istio-cni
 oc create ns bookinfo
 oc create ns istio-tempo
 
-oc label namespace bookinfo mesh=test-istio-v3 
 oc label namespace bookinfo istio.io/rev=test-istio-v3
 
 oc apply -f tempo-stack
