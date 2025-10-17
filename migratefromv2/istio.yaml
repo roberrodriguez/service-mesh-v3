@@ -1,7 +1,7 @@
 apiVersion: sailoperator.io/v1
 kind: Istio
 metadata:
-  name: test-istio-v2
+  name: test-smcp-v2
 spec:
   namespace: test-smcp-v2
   values:

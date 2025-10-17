@@ -29,6 +29,11 @@ done
 oc apply -f 2.1.ingressgateway-migration.yaml
 oc scale deploy istio-ingressgateway --replicas=0
 
+oc label service istio-ingressgateway app.kubernetes.io/managed-by-
+oc patch service istio-ingressgateway --type='json' -p='[{"op": "remove", "path": "/metadata/ownerReferences"}]'
+oc patch smcp ossm-controlplane-v2 --type='json' -p='[{"op": "replace", "path": "/spec/gateways/ingress/enabled", "value": false}]'
+
+
 ## 2.2 Deshabilitar extensiones del SMCP y activar opentelemetry (https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html-single/migrating_from_service_mesh_2_to_service_mesh_3/index#service-mesh-control-plane-resource-file_ossm-migrating-premigration-checklists)
 
 oc apply -f otel-collector.yaml
@@ -38,6 +43,9 @@ oc apply -f telemetry.yaml
 oc apply -f kiali.yaml
 oc apply -f monitoring.yaml
 
+# Para borrar el pod del elasticsearch
+oc delete pvc --all 
+
 # solo una vez, es comun para todos los istios
 oc create ns istio-cni
 oc apply -f istiocni.yaml
@@ -45,4 +53,11 @@ oc apply -f istiocni.yaml
 oc apply -f istio.yaml
 
 oc label namespace bookinfo istio.io/rev=test-smcp-v2
-oc -n bookinfo delete pod --all
+
+# en la doc ponia labelear para que no inyecte el v2 pero 
+# oc label ns bookinfo maistra.io/ignore-namespace=true
+# pero me daba error al reiniciar los pods, he tenido que eliminar en smcp y smmr antiguos
+oc delete smmr --all
+oc delete smcp --all
+
+oc rollout restart deployments -n bookinfo
