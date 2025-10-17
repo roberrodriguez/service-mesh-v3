@@ -19,7 +19,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name:  secret-reader
-  namespace: <gateway_namespace>
+  namespace: test-smcp-v2
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -31,7 +31,7 @@ subjects:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: istio-ingressgateway-canary
+  name: istio-ingressgateway
   namespace: test-smcp-v2
 spec:
   selector:
