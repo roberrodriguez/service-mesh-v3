@@ -37,13 +37,17 @@ spec:
     ingester:
       replicas: 2
     distributor:
-      replicas: 2
+      component:
+        replicas: 2
     gateway:
-      replicas: 2
+      component:
+        replicas: 2
       enabled: true
     querier:
       replicas: 2
     queryFrontend:
+      component:
+        replicas: 2
       jaegerQuery:
         enabled: true  
   limits:
