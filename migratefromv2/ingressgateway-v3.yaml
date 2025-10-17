@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: istio-ingressgateway-canary
-  namespace: test-scmp-v2
+  namespace: test-smcp-v2
 spec:
   selector:
     matchLabels:
