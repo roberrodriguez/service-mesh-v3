@@ -54,6 +54,11 @@ oc apply -f istio.yaml
 
 oc label namespace bookinfo istio.io/rev=test-smcp-v2
 
+oc create ns test-smcp-v2-ingress
+oc label namespace test-smcp-v2-ingress istio.io/rev=test-smcp-v2
+oc -n test-smcp-v2-ingress apply -f ingressgateway-v3.yaml
+oc delete -f 2.1.ingressgateway-migration.yaml
+
 # en la doc ponia labelear para que no inyecte el v2 pero 
 # oc label ns bookinfo maistra.io/ignore-namespace=true
 # pero me daba error al reiniciar los pods, he tenido que eliminar en smcp y smmr antiguos
