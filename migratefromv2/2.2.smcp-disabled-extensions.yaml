@@ -1,0 +1,32 @@
+apiVersion: maistra.io/v2
+kind: ServiceMeshControlPlane
+metadata:
+  name: ossm-controlplane-v2
+  namespace: test-smcp-v2
+spec:
+  security:
+    managedNetworkPolicy: false
+  tracing:
+    type: None
+  gateways:
+    enabled: false
+    openshiftRoute:
+      enabled: false
+  policy:
+    type: Istiod
+  telemetry:
+    type: Istiod
+
+  addons:
+    grafana:
+      enabled: false
+    kiali:
+      enabled: false
+    prometheus:
+      enabled: false
+  meshConfig:
+    extensionProviders:
+    - name: otel
+      opentelemetry:
+        port: 4317
+        service: otel-collector.test-smcp-v2.svc.cluster.local 

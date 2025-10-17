@@ -24,3 +24,25 @@ done
 ## Podemos acceder a productinfo con http://istio-ingressgateway-test-smcp-v2.apps.ocp4poc.example.com/productpage
 
 # 2. MIGRACION
+
+## 2.1 Migrar la istio-ingressgateways (https://docs.redhat.com/en/documentation/openshift_container_platform/4.17/html/service_mesh/service-mesh-2-x#ossm-about-gateway-migration_gateway-migration)
+oc apply -f 2.1.ingressgateway-migration.yaml
+oc scale deploy istio-ingressgateway --replicas=0
+
+## 2.2 Deshabilitar extensiones del SMCP y activar opentelemetry (https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html-single/migrating_from_service_mesh_2_to_service_mesh_3/index#service-mesh-control-plane-resource-file_ossm-migrating-premigration-checklists)
+
+oc apply -f otel-collector.yaml
+oc apply -f tempo-rolebindings.yaml
+oc apply -f 2.2.smcp-disabled-extensions.yaml
+oc apply -f telemetry.yaml
+oc apply -f kiali.yaml
+oc apply -f monitoring.yaml
+
+# solo una vez, es comun para todos los istios
+oc create ns istio-cni
+oc apply -f istiocni.yaml
+
+oc apply -f istio.yaml
+
+oc label namespace bookinfo istio.io/rev=test-smcp-v2
+oc -n bookinfo delete pod --all

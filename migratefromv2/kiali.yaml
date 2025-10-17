@@ -1,0 +1,49 @@
+# https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html/observability/kiali-operator-provided-by-red-hat#ossm-config-openshift-monitoring-kiali_ossm-kiali
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kiali-monitoring-rbac
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-monitoring-view
+subjects:
+- kind: ServiceAccount
+  name: kiali-service-account
+  namespace: test-smcp-v2
+---
+apiVersion: kiali.io/v1alpha1
+kind: Kiali
+metadata:
+  name: kiali-user-workload-monitoring
+  namespace: test-smcp-v2
+spec:
+  # No hace falta HA
+  # deployment:
+  #   replicas: 2
+  external_services:
+    grafana:
+      enabled: false #  Grafana is not supported with OpenShift Service Mesh 3.0. 
+    prometheus:
+      auth:
+        type: bearer
+        use_kiali_token: true
+      thanos_proxy:
+        enabled: true
+      url: https://thanos-querier.openshift-monitoring.svc.cluster.local:9091
+    tracing:
+      enabled: true 
+      provider: tempo 
+      use_grpc: false
+      namespace_selector: true
+      internal_url: https://tempo-istio-tempostack-gateway.istio-tempo.svc.cluster.local:8080/api/traces/v1/dev/tempo
+      external_url: https://tempo-istio-tempostack-gateway-istio-tempo.apps.ocp4poc.example.com/api/traces/v1/dev/search
+      health_check_url: https://tempo-istio-tempostack-gateway.istio-tempo.apps.ocp4poc.example.com/api/traces/v1/dev/tempo/api/echo 
+      auth: 
+        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+        insecure_skip_verify: false
+        type: bearer
+        use_kiali_token: true
+      tempo_config:
+         url_format: "jaeger" 

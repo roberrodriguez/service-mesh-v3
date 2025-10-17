@@ -1,0 +1,24 @@
+apiVersion: sailoperator.io/v1
+kind: Istio
+metadata:
+  name: test-istio-v2
+spec:
+  namespace: test-smcp-v2
+  values:
+    pilot:
+      autoscaleMin: 1
+      autoscaleMax: 5 
+      cpu:
+        targetAverageUtilization: 80 
+      memory:
+        targetAverageUtilization: 80 
+    meshConfig:
+      enableTracing: true
+      extensionProviders:
+      - name: otel
+        opentelemetry:
+          port: 4317
+          service: otel-collector.test-smcp-v2.svc.cluster.local 
+      discoverySelectors:
+        - matchLabels:
+            istio.io/rev: test-smcp-v2

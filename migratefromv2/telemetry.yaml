@@ -1,0 +1,10 @@
+apiVersion: telemetry.istio.io/v1
+kind: Telemetry
+metadata:
+  name: otel-tracing
+  namespace: test-smcp-v2
+spec:
+  tracing:
+    - providers:
+        - name: otel
+      randomSamplingPercentage: 100
