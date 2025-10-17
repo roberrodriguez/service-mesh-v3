@@ -4,11 +4,13 @@ metadata:
   name: otel
   namespace: test-istio-v3
 spec:
-  autoscaler:
-    minReplicas: 1
-    maxReplicas: 3
-    targetCPUUtilization: 50
-    targetMemoryUtilization: 60
+  replicas: 2
+  # Para autoscaler habria que definir requests
+  # autoscaler:
+  #   minReplicas: 1
+  #   maxReplicas: 3
+  #   targetCPUUtilization: 50
+  #   targetMemoryUtilization: 60
   observability:
     metrics:
       enableMetrics: true

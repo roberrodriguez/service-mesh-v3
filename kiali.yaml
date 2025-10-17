@@ -19,6 +19,9 @@ metadata:
   name: kiali-user-workload-monitoring
   namespace: test-istio-v3
 spec:
+  # No hace falta HA
+  # deployment:
+  #   replicas: 2
   external_services:
     grafana:
       enabled: false

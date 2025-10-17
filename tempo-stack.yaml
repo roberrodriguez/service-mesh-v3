@@ -34,8 +34,15 @@ spec:
     global:
       traces: 48h
   template:
+    ingester:
+      replicas: 2
+    distributor:
+      replicas: 2
     gateway:
+      replicas: 2
       enabled: true
+    querier:
+      replicas: 2
     queryFrontend:
       jaegerQuery:
         enabled: true  
