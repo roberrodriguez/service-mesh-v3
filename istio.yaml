@@ -6,7 +6,7 @@ spec:
   namespace: test-istio-v3
   values:
     pilot:
-      autoscaleMin: 2 
+      autoscaleMin: 1
       autoscaleMax: 5 
       cpu:
         targetAverageUtilization: 80 
