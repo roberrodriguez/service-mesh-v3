@@ -33,6 +33,8 @@ spec:
   retention:
     global:
       traces: 48h
+  storageClassName: nfs-csi # Storage class name for ingester
+  storageSize: 10Gi # Storage size for ingester
   template:
     ingester:
       replicas: 2
