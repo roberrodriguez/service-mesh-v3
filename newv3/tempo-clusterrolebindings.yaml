@@ -1,7 +1,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: kiali-istio-_TEMPO_NAMESPACE_-traces-read-_TENANT_
+  name: kiali-_CONTROL_PLANE_-traces-read-_TENANT_
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -14,7 +14,7 @@ subjects:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: kiali-istio-_TEMPO_NAMESPACE_-traces-write-_TENANT_
+  name: otel-_CONTROL_PLANE_-traces-write-_TENANT_
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole

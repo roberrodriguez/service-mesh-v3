@@ -3,7 +3,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: kiali-monitoring-rbac
+  name: kiali-_CONTROL_PLANE_-monitoring
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -11,28 +11,25 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: kiali-service-account
-  namespace: test-smcp-v2
+  namespace: _CONTROL_PLANE_
 ---
 apiVersion: kiali.io/v1alpha1
 kind: Kiali
 metadata:
   name: kiali
-  namespace: test-smcp-v2
 spec:
   deployment:
     cluster_wide_access: false
     discovery_selectors:
       default:
       - matchLabels:
-          istio.io/rev: test-smcp-v2
+          istio.io/rev: _CONTROL_PLANE_
   # No hace falta HA
   # deployment:
   #   replicas: 2
   external_services:
     grafana:
       enabled: false
-      # internal_url: "http://grafana-service.test-istio-v3.svc.cluster.local:3000"
-      # external_url: "https://grafana-route-test-istio-v3.apps.ocp4poc.example.com"
     prometheus:
       auth:
         type: bearer
@@ -45,9 +42,9 @@ spec:
       provider: tempo
       use_grpc: false
       namespace_selector: true
-      internal_url: https://tempo-istio-tempostack-gateway.istio-tempo.svc.cluster.local:8080/api/traces/v1/dev/tempo
-      external_url: https://tempo-istio-tempostack-gateway-istio-tempo.apps.ocp4poc.example.com/api/traces/v1/dev/search
-      health_check_url: https://tempo-istio-tempostack-gateway.istio-tempo.apps.ocp4poc.example.com/api/traces/v1/dev/tempo/api/echo
+      internal_url: https://tempo-istio-tempostack-gateway._TEMPO_NAMESPACE_.svc.cluster.local:8080/api/traces/v1/_TENANT_/tempo
+      external_url: https://tempo-istio-tempostack-gateway-_TEMPO_NAMESPACE_.apps._CLUSTER_DNS_/api/traces/v1/_TENANT_/search
+      health_check_url: https://tempo-istio-tempostack-gateway._TEMPO_NAMESPACE_.apps._CLUSTER_DNS_/api/traces/v1/_TENANT_/tempo/api/echo
       auth:
         ca_file: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
         insecure_skip_verify: false
