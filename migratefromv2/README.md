@@ -41,7 +41,7 @@ oc -n ${CONTROL_PLANE_NS} patch smcp ossm-controlplane-v2 --type='json' -p='[{"o
 
 ## 2.2 Deshabilitar extensiones del SMCP y activar opentelemetry (https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html-single/migrating_from_service_mesh_2_to_service_mesh_3/index#service-mesh-control-plane-resource-file_ossm-migrating-premigration-checklists)
 
-cat otel-collector.yaml | sed "s/_TEMPO_NAMESPACE_/$TEMPO_NS/g" | oc -n ${CONTROL_PLANE_NS} apply -f-
+cat otel-collector.yaml | sed "s/_TEMPO_NAMESPACE_/$TEMPO_NS/g" | sed "s/_TENANT_/$TENANT/g" | oc -n ${CONTROL_PLANE_NS} apply -f-
 oc -n ${CONTROL_PLANE_NS} apply -f telemetry.yaml
 oc -n ${CONTROL_PLANE_NS} apply -f monitoring-control-plane.yaml
 

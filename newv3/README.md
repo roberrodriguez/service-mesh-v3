@@ -30,7 +30,7 @@ oc label ns ${CONTROL_PLANE_NS} istio-injection=disabled
 ## 2.2 Creamos los objetos de control plane
 
 cat istio.yaml | sed "s/_CONTROL_PLANE_/$CONTROL_PLANE_NS/g" | oc apply -f-
-cat otel-collector.yaml | sed "s/_TEMPO_NAMESPACE_/$TEMPO_NS/g" | oc -n ${CONTROL_PLANE_NS} apply -f-
+cat otel-collector.yaml | sed "s/_TEMPO_NAMESPACE_/$TEMPO_NS/g" | sed "s/_TENANT_/$TENANT/g" | oc -n ${CONTROL_PLANE_NS} apply -f-
 oc -n ${CONTROL_PLANE_NS} apply -f telemetry.yaml
 oc -n ${CONTROL_PLANE_NS} apply -f monitoring-control-plane.yaml
 

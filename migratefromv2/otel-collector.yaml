@@ -24,7 +24,7 @@ spec:
         auth:
           authenticator: bearertokenauth
         headers:
-          X-Scope-OrgID: "prod"
+          X-Scope-OrgID: "_TENANT_"
     extensions:
       bearertokenauth:
         filename: "/var/run/secrets/kubernetes.io/serviceaccount/token"           
