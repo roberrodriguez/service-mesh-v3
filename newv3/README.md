@@ -24,6 +24,6 @@ oc apply -f telemetry.yaml
 
 oc apply -f https://raw.githubusercontent.com/openshift-service-mesh/istio/release-1.24/samples/bookinfo/platform/kube/bookinfo.yaml -n bookinfo-v3
 
-oc -n bookinfo expose svc/productpage
+oc -n bookinfo-v3 expose svc/productpage
 
 oc apply -f monitoring.yaml
