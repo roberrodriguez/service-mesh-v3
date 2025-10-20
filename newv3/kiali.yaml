@@ -16,9 +16,14 @@ subjects:
 apiVersion: kiali.io/v1alpha1
 kind: Kiali
 metadata:
-  name: kiali-user-workload-monitoring
-  namespace: test-istio-v3
+  name: kiali
 spec:
+  deployment:
+    cluster_wide_access: false
+    discovery_selectors:
+      default:
+      - matchLabels:
+          istio.io/rev: test-istio-v3
   # No hace falta HA
   # deployment:
   #   replicas: 2
@@ -35,17 +40,17 @@ spec:
         enabled: true
       url: https://thanos-querier.openshift-monitoring.svc.cluster.local:9091
     tracing:
-      enabled: true 
-      provider: tempo 
+      enabled: true
+      provider: tempo
       use_grpc: false
       namespace_selector: true
       internal_url: https://tempo-istio-tempostack-gateway.istio-tempo.svc.cluster.local:8080/api/traces/v1/prod/tempo
       external_url: https://tempo-istio-tempostack-gateway-istio-tempo.apps.ocp4poc.example.com/api/traces/v1/prod/search
-      health_check_url: https://tempo-istio-tempostack-gateway.istio-tempo.apps.ocp4poc.example.com/api/traces/v1/prod/tempo/api/echo 
-      auth: 
+      health_check_url: https://tempo-istio-tempostack-gateway.istio-tempo.apps.ocp4poc.example.com/api/traces/v1/prod/tempo/api/echo
+      auth:
         ca_file: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
         insecure_skip_verify: false
         type: bearer
         use_kiali_token: true
       tempo_config:
-         url_format: "jaeger" 
+         url_format: "jaeger"

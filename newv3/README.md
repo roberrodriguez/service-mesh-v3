@@ -38,11 +38,11 @@ oc apply -f https://raw.githubusercontent.com/openshift-service-mesh/istio/relea
 
 oc -n test-istio-v3-ingress expose svc/ingressgateway --port=http2
 
-# Añadir label para inyectar sidecars
-for f in $(oc -n bookinfo-v3 get deploy --no-headers -o custom-columns=":metadata.name"); 
-do 
-    oc -n bookinfo-v3 patch deploy $f --type merge -p '{"spec":{"template":{"metadata":{"labels":{"sidecar.istio.io/inject":"true"}}}}}'
-done
-
-
 oc apply -f monitoring.yaml
+
+# Añadir label para inyectar sidecars
+# Los pods que no han de tener sidecar se le tiene que poner la label sidecar.istio.io/inject=false
+
+# El Kiali solo usa el discoverer_selector cuando se instala, si a posteriori se añade algun otro namespace al mesh
+# hay que forzar a que lo recalcule con
+# oc get kiali kiali -o yaml | oc apply -f-
