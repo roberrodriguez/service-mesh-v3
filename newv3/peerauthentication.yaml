@@ -1,8 +1,7 @@
 apiVersion: security.istio.io/v1
 kind: PeerAuthentication
 metadata:
-  name: test-istio-v3-peerauth
-  namespace: test-istio-v3
+  name: istio-peerauth-strict
 spec:
   mtls:
     mode: STRICT

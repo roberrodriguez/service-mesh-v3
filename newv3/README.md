@@ -41,6 +41,9 @@ cat kiali.yaml | sed "s/_CONTROL_PLANE_/$CONTROL_PLANE_NS/g" | sed "s/_TENANT_/$
 # hay que forzar a que lo recalcule con
 # oc -n ${CONTROL_PLANE_NS} get kiali kiali -o yaml | oc apply -f-
 
+# Si queremos que no se pueda acceder desde el exterior al mesh podemos habilitar el mTLS estricto
+# oc -n ${CONTROL_PLANE_NS} apply -f peerauthentication.yaml
+
 
 
 # 3. Creamos el namespace donde irá el ingressgateway
