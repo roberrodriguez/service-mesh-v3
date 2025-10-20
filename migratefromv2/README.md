@@ -58,11 +58,19 @@ oc create ns test-smcp-v2-ingress
 oc label namespace test-smcp-v2-ingress istio.io/rev=test-smcp-v2
 oc -n test-smcp-v2-ingress apply -f ingressgateway-v3.yaml
 oc delete -f 2.1.ingressgateway-migration.yaml
+oc delete svc istio-ingressgateway
 
 # en la doc ponia labelear para que no inyecte el v2 pero 
 # oc label ns bookinfo maistra.io/ignore-namespace=true
 # pero me daba error al reiniciar los pods, he tenido que eliminar en smcp y smmr antiguos
 oc delete smmr --all
 oc delete smcp --all
+
+# Quitar la annotation para inyectar sidecars
+for f in $(oc -n bookinfo get deploy --no-headers -o custom-columns=":metadata.name"); 
+do 
+    oc -n bookinfo patch deploy $f --type json -p='[{"op": "remove", "path": "/spec/template/metadata/annotations/sidecar.istio.io~1inject"}]'
+done
+
 
 oc rollout restart deployments -n bookinfo
