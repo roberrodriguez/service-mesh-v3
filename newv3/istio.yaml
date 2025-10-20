@@ -7,7 +7,7 @@ spec:
   values:
     pilot:
       autoscaleMin: 1
-      autoscaleMax: 5 
+      autoscaleMax: 5
       cpu:
         targetAverageUtilization: 80 
       memory:
