@@ -68,4 +68,4 @@ oc apply -f https://raw.githubusercontent.com/openshift-service-mesh/istio/relea
 
 # El Kiali solo usa el discoverer_selector cuando se instala, si a posteriori se añade algun otro namespace al mesh
 # hay que forzar a que lo recalcule con
-# oc get kiali kiali -o yaml | oc apply -f-
+# oc -n ${CONTROL_PLANE_NS} get kiali kiali -o yaml | oc apply -f-
