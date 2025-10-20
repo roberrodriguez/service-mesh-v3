@@ -19,8 +19,8 @@ spec:
 apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
 metadata:
-  name: bookinfo-proxies-monitor
-  namespace: bookinfo
+  name: bookinfo-proxies-monitor-v3
+  namespace: bookinfo-v3
 spec:
   selector:
     matchExpressions:
