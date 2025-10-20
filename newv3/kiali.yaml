@@ -42,9 +42,9 @@ spec:
       provider: tempo
       use_grpc: false
       namespace_selector: true
-      internal_url: https://tempo-istio-tempostack-gateway.istio-tempo.svc.cluster.local:8080/api/traces/v1/_TENANT_/tempo
-      external_url: https://tempo-istio-tempostack-gateway-istio-tempo.apps.ocp4poc.example.com/api/traces/v1/_TENANT_/search
-      health_check_url: https://tempo-istio-tempostack-gateway.istio-tempo.apps.ocp4poc.example.com/api/traces/v1/_TENANT_/tempo/api/echo
+      internal_url: https://tempo-istio-tempostack-gateway._TEMPO_NAMESPACE_.svc.cluster.local:8080/api/traces/v1/_TENANT_/tempo
+      external_url: https://tempo-istio-tempostack-gateway-_TEMPO_NAMESPACE_.apps._CLUSTER_DNS_/api/traces/v1/_TENANT_/search
+      health_check_url: https://tempo-istio-tempostack-gateway._TEMPO_NAMESPACE_.apps._CLUSTER_DNS_/api/traces/v1/_TENANT_/tempo/api/echo
       auth:
         ca_file: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
         insecure_skip_verify: false

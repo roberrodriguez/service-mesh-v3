@@ -14,6 +14,7 @@ INGRESS_NS=${CONTROL_PLANE_NS}-ingress
 DATA_PLANE_NS=bookinfo-v3
 TEMPO_NS=istio-tempo
 TENANT=prod
+CLUSTER_DNS=ocp4poc.example.com
 
 # 2. Creamos el control Plane
 
@@ -31,7 +32,7 @@ oc -n ${CONTROL_PLANE_NS} apply -f monitoring-control-plane.yaml
 
 cat tempo-clusterrolebindings.yaml | sed "s/_TENANT_/$TENANT/g" | sed "s/_TEMPO_NAMESPACE_/$TEMPO_NS/g" | sed "s/_CONTROL_PLANE_/$CONTROL_PLANE_NS/g" | oc apply -f-
 
-cat kiali.yaml | sed "s/_CONTROL_PLANE_/$CONTROL_PLANE_NS/g" | sed "s/_TENANT_/$TENANT/g" | oc -n ${CONTROL_PLANE_NS} apply -f-
+cat kiali.yaml | sed "s/_CONTROL_PLANE_/$CONTROL_PLANE_NS/g" | sed "s/_TENANT_/$TENANT/g" | sed "s/_TEMPO_NAMESPACE_/$TEMPO_NS/g" | sed "s/_CLUSTER_DNS_/$CLUSTER_DNS/g" | oc -n ${CONTROL_PLANE_NS} apply -f-
 
 # 3. Creamos el namespace donde irá el ingressgateway
 
