@@ -7,6 +7,8 @@ oc create ns bookinfo
 oc apply -f smcp-orig.yaml
 oc apply -f smmr.yaml
 
+oc expose svc/istio-ingressgateway --port=http2
+
 oc apply -f https://raw.githubusercontent.com/openshift-service-mesh/istio/release-1.24/samples/bookinfo/platform/kube/bookinfo.yaml -n bookinfo
 
 oc apply -f https://raw.githubusercontent.com/openshift-service-mesh/istio/release-1.24/samples/bookinfo/networking/bookinfo-gateway.yaml -n bookinfo
