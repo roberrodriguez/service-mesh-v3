@@ -7,41 +7,59 @@ oc create secret generic cacert \
   --from-file=ca.crt=custom-ca.crt \
   -n test-istio-v3
 
+# 1. Definimos las variables
 
-# solo una vez, es comun para todos los istios
-oc create ns istio-cni
-oc apply -f istiocni.yaml
+CONTROL_PLANE_NS=test-istio-v3
+INGRESS_NS=${CONTROL_PLANE_NS}-ingress
+DATA_PLANE_NS=bookinfo-v3
+TEMPO_NS=istio-tempo
+TENANT=prod
 
-# Crear namespaces
-oc create ns test-istio-v3
-oc create ns bookinfo-v3
-oc create ns istio-tempo
-oc create ns test-istio-v3-ingress
+# 2. Creamos el control Plane
 
-oc label namespace test-istio-v3-ingress istio.io/rev=test-istio-v3
-oc label namespace test-istio-v3 istio.io/rev=test-istio-v3
-oc label namespace test-istio-v3 istio-injection=disabled
-oc label namespace bookinfo istio.io/rev=test-istio-v3
+## 2.1 Creamos el namespace
+oc create ns ${CONTROL_PLANE_NS}
+oc label ns ${CONTROL_PLANE_NS} istio.io/rev=${CONTROL_PLANE_NS}
+oc label ns ${CONTROL_PLANE_NS} istio-injection=disabled
 
-oc apply -f tempo-stack
-oc apply -f istio.yaml
-oc apply -f otel-collector.yaml
-oc apply -f tempo-rolebindings.yaml
-oc apply -f telemetry.yaml
-oc apply -f kiali.yaml
+## 2.2 Creamos los objetos de control plane
 
-oc -n test-istio-v3-ingress apply -f ingressgateway.yaml
+cat istio.yaml | sed "s/_CONTROL_PLANE_/$CONTROL_PLANE_NS/g" | oc apply -f-
+cat otel-collector.yaml | sed "s/_TEMPO_NAMESPACE_/$TEMPO_NS/g" | oc -n ${CONTROL_PLANE_NS} apply -f-
+oc -n ${CONTROL_PLANE_NS} apply -f telemetry.yaml
+oc -n ${CONTROL_PLANE_NS} apply -f monitoring-control-plane.yaml
+
+cat tempo-clusterrolebindings.yaml | sed "s/_TENANT_/$TENANT/g" | sed "s/_TEMPO_NAMESPACE_/$TEMPO_NS/g" | oc apply -f-
+
+cat kiali.yaml | sed "s/_CONTROL_PLANE_/$CONTROL_PLANE_NS/g" | sed "s/_TENANT_/$TENANT/g" | oc -n ${CONTROL_PLANE_NS} apply -f-
+
+# 3. Creamos el namespace donde irá el ingressgateway
+
+## 3.1 Cremos el namespace
+oc create ns ${INGRESS_NS}
+oc label ns ${INGRESS_NS} istio.io/rev=${CONTROL_PLANE_NS}
+
+## 3.2 Desplegamos el ingress, para pruebas podemos tambien exponer el servicio con 
+## oc -n ${INGRESS_NS} expose svc/ingressgateway --port=http2
+oc -n ${INGRESS_NS} apply -f ingressgateway.yaml
 
 
-oc apply -f https://raw.githubusercontent.com/openshift-service-mesh/istio/release-1.24/samples/bookinfo/platform/kube/bookinfo.yaml -n bookinfo-v3
-oc apply -f https://raw.githubusercontent.com/openshift-service-mesh/istio/release-1.24/samples/bookinfo/networking/bookinfo-gateway.yaml -n bookinfo-v3
+# 4. Creamos el o los namespaces de aplicacion
+## 4.1 Creamos el namespace  con el label de istio.io/rev
+oc create ns ${DATA_PLANE_NS}
+oc label ns ${DATA_PLANE_NS} istio.io/rev=${CONTROL_PLANE_NS}
 
-oc -n test-istio-v3-ingress expose svc/ingressgateway --port=http2
+# 4.2 Desplegamos el pod monitor para recoger métricas de los istio-proxy
+oc -n ${DATA_PLANE_NS} apply -f monitoring-data-plane.yaml
 
-oc apply -f monitoring.yaml
+## Se inyectará el sidecar a todos los pods, si no los queremos, se le tiene que poner la label 
+##  sidecar.istio.io/inject=false
+## a los pods que no han de tener sidecar
 
-# Añadir label para inyectar sidecars
-# Los pods que no han de tener sidecar se le tiene que poner la label sidecar.istio.io/inject=false
+## 4.3 Desplegamos la aplicación como tal
+oc apply -f https://raw.githubusercontent.com/openshift-service-mesh/istio/release-1.24/samples/bookinfo/platform/kube/bookinfo.yaml -n ${DATA_PLANE_NS}
+oc apply -f https://raw.githubusercontent.com/openshift-service-mesh/istio/release-1.24/samples/bookinfo/networking/bookinfo-gateway.yaml -n ${DATA_PLANE_NS}
+
 
 # El Kiali solo usa el discoverer_selector cuando se instala, si a posteriori se añade algun otro namespace al mesh
 # hay que forzar a que lo recalcule con

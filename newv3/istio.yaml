@@ -1,9 +1,9 @@
 apiVersion: sailoperator.io/v1
 kind: Istio
 metadata:
-  name: test-istio-v3
+  name: _CONTROL_PLANE_
 spec:
-  namespace: test-istio-v3
+  namespace: _CONTROL_PLANE_
   values:
     pilot:
       autoscaleMin: 1
@@ -18,8 +18,8 @@ spec:
       - name: otel
         opentelemetry:
           port: 4317
-          service: otel-collector.test-istio-v3.svc.cluster.local 
+          service: otel-collector._CONTROL_PLANE_.svc.cluster.local 
       discoverySelectors:
         - matchLabels:
-            istio.io/rev: test-istio-v3
+            istio.io/rev: _CONTROL_PLANE_
 

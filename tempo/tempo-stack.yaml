@@ -1,20 +1,7 @@
-apiVersion: v1
-kind: Secret
-metadata:
-  name: tempo-storage-secret
-  namespace: istio-tempo
-type: Opaque
-stringData:
-  endpoint: http://minio.minio.svc:9000
-  access_key_id: PVYxWNd3tZAIvAk27i4k
-  access_key_secret: jXrjxziQRPPVjbegSTDPDenTMb30WiOEGBMtE8Pu
-  bucket: tempo-smcp
----
 apiVersion: tempo.grafana.com/v1alpha1
 kind: TempoStack
 metadata:
   name: istio-tempostack
-  namespace: istio-tempo
 spec:
   tenants:
     mode: openshift

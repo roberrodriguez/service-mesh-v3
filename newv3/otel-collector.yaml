@@ -2,7 +2,6 @@ kind: OpenTelemetryCollector
 apiVersion: opentelemetry.io/v1beta1
 metadata:
   name: otel
-  namespace: test-istio-v3
 spec:
   replicas: 2
   # Para autoscaler habria que definir requests
@@ -18,7 +17,7 @@ spec:
   config:
     exporters:
       otlp:
-        endpoint: 'tempo-istio-tempostack-gateway.istio-tempo.svc:8090'
+        endpoint: 'tempo-istio-tempostack-gateway._TEMPO_NAMESPACE_.svc:8090'
         tls:
           insecure: false
           ca_file: "/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt"

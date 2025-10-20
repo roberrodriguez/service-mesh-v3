@@ -2,7 +2,6 @@ apiVersion: telemetry.istio.io/v1
 kind: Telemetry
 metadata:
   name: otel-tracing
-  namespace: test-istio-v3
 spec:
   tracing:
     - providers:

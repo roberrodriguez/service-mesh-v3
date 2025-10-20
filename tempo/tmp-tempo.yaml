@@ -1,0 +1,49 @@
+apiVersion: tempo.grafana.com/v1alpha1
+kind: TempoStack
+metadata:
+  name: istio-tempostack
+spec:
+  tenants:
+    mode: openshift
+    authentication:
+      - tenantName: ''
+        tenantId: ''
+  storage:
+    secret:
+      name: tempo-storage-secret
+      type: s3
+    trace:
+      backend: s3
+  replicationFactor: 1
+  retention:
+    global:
+      traces: 48h
+  storageClassName: nfs-csi
+  storageSize: 10Gi
+  template:
+    ingester:
+      replicas: 2
+    distributor:
+      component:
+        replicas: 2
+    gateway:
+      component:
+        replicas: 2
+      enabled: true
+    querier:
+      replicas: 2
+    queryFrontend:
+      component:
+        replicas: 2
+      jaegerQuery:
+        enabled: true
+  limits:
+    global:
+      ingestion:
+        rate: 10000
+        burstSize: 20000
+      query:
+        timeout: 30s
+  observability:
+    grafana:
+      enabled: true
