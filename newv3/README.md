@@ -14,6 +14,8 @@ oc create ns istio-cni
 oc create ns bookinfo-v3
 oc create ns istio-tempo
 
+oc label namespace test-istio-v3 istio.io/rev=test-istio-v3
+oc label namespace test-istio-v3 istio-injection=disabled
 oc label namespace bookinfo istio.io/rev=test-istio-v3
 
 oc apply -f tempo-stack
@@ -26,5 +28,12 @@ oc apply -f kiali.yaml
 oc apply -f https://raw.githubusercontent.com/openshift-service-mesh/istio/release-1.24/samples/bookinfo/platform/kube/bookinfo.yaml -n bookinfo-v3
 
 oc -n bookinfo-v3 expose svc/productpage
+
+# Añadir label para inyectar sidecars
+for f in $(oc -n bookinfo-v3 get deploy --no-headers -o custom-columns=":metadata.name"); 
+do 
+    oc -n bookinfo-v3 patch deploy $f --type merge -p '{"spec":{"template":{"metadata":{"labels":{"sidecar.istio.io/inject":"true"}}}}}'
+done
+
 
 oc apply -f monitoring.yaml

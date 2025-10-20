@@ -21,4 +21,4 @@ spec:
           service: otel-collector.test-smcp-v2.svc.cluster.local 
       discoverySelectors:
         - matchLabels:
-            istio.io/rev: test-smcp-v2
+            mesh: test-smcp-v2
