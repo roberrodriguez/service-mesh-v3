@@ -1,0 +1,85 @@
+# https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.1/html/gateways/ossm-about-gateways#ossm-installing-gateway-using-gateway-injection_ossm-about-gateways
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: secret-reader
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: secret-reader
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "watch", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name:  secret-reader
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: secret-reader
+subjects:
+  - kind: ServiceAccount
+    name:  secret-reader
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: istio-ingressgateway
+spec:
+  selector:
+    matchLabels:
+      istio: ingressgateway
+  template:
+    metadata:
+      annotations:
+        inject.istio.io/templates: gateway 
+      labels:
+        istio: ingressgateway
+        sidecar.istio.io/inject: "true" 
+    spec:
+      containers:
+        - name: istio-proxy
+          image: auto 
+          securityContext:
+            capabilities:
+              drop:
+              - ALL
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          ports:
+          - containerPort: 15090
+            protocol: TCP
+            name: http-envoy-prom
+      securityContext:
+        sysctls:
+        - name: net.ipv4.ip_unprivileged_port_start
+          value: "0"
+      serviceAccountName: secret-reader
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ingressgateway
+spec:
+  type: ClusterIP 
+  selector:
+    istio: ingressgateway
+  ports:
+    - name: status-port
+      port: 15021
+      protocol: TCP
+      targetPort: 15021
+    - name: http2
+      port: 80
+      protocol: TCP
+      targetPort: 8080
+    - name: https
+      port: 443
+      protocol: TCP
+      targetPort: 443
