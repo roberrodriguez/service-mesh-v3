@@ -37,6 +37,11 @@ oc -n ${CONTROL_PLANE_NS} apply -f monitoring-control-plane.yaml
 cat tempo-clusterrolebindings.yaml | sed "s/_TENANT_/$TENANT/g" | sed "s/_TEMPO_NAMESPACE_/$TEMPO_NS/g" | sed "s/_CONTROL_PLANE_/$CONTROL_PLANE_NS/g" | oc apply -f-
 
 cat kiali.yaml | sed "s/_CONTROL_PLANE_/$CONTROL_PLANE_NS/g" | sed "s/_TENANT_/$TENANT/g" | sed "s/_TEMPO_NAMESPACE_/$TEMPO_NS/g" | sed "s/_CLUSTER_DNS_/$CLUSTER_DNS/g" | oc -n ${CONTROL_PLANE_NS} apply -f-
+# El Kiali solo usa el discoverer_selector cuando se instala, si a posteriori se añade algun otro namespace al mesh
+# hay que forzar a que lo recalcule con
+# oc -n ${CONTROL_PLANE_NS} get kiali kiali -o yaml | oc apply -f-
+
+
 
 # 3. Creamos el namespace donde irá el ingressgateway
 
@@ -66,6 +71,3 @@ oc apply -f https://raw.githubusercontent.com/openshift-service-mesh/istio/relea
 oc apply -f https://raw.githubusercontent.com/openshift-service-mesh/istio/release-1.24/samples/bookinfo/networking/bookinfo-gateway.yaml -n ${DATA_PLANE_NS}
 
 
-# El Kiali solo usa el discoverer_selector cuando se instala, si a posteriori se añade algun otro namespace al mesh
-# hay que forzar a que lo recalcule con
-# oc -n ${CONTROL_PLANE_NS} get kiali kiali -o yaml | oc apply -f-
