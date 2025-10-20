@@ -32,38 +32,46 @@ CLUSTER_DNS=ocp4poc.example.com
 
 ## 2.1 Migrar la istio-ingressgateways (https://docs.redhat.com/en/documentation/openshift_container_platform/4.17/html/service_mesh/service-mesh-2-x#ossm-about-gateway-migration_gateway-migration)
 oc -n ${CONTROL_PLANE_NS} apply -f ingressgateway-migration.yaml
-oc scale deploy istio-ingressgateway --replicas=0
+oc -n ${CONTROL_PLANE_NS} scale deploy istio-ingressgateway --replicas=0
 
-oc label service istio-ingressgateway app.kubernetes.io/managed-by-
-oc patch service istio-ingressgateway --type='json' -p='[{"op": "remove", "path": "/metadata/ownerReferences"}]'
-oc patch smcp ossm-controlplane-v2 --type='json' -p='[{"op": "replace", "path": "/spec/gateways/ingress/enabled", "value": false}]'
+oc -n ${CONTROL_PLANE_NS} label service istio-ingressgateway app.kubernetes.io/managed-by-
+oc -n ${CONTROL_PLANE_NS} patch service istio-ingressgateway --type='json' -p='[{"op": "remove", "path": "/metadata/ownerReferences"}]'
+oc -n ${CONTROL_PLANE_NS} patch smcp ossm-controlplane-v2 --type='json' -p='[{"op": "replace", "path": "/spec/gateways/ingress/enabled", "value": false}]'
 
 
 ## 2.2 Deshabilitar extensiones del SMCP y activar opentelemetry (https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html-single/migrating_from_service_mesh_2_to_service_mesh_3/index#service-mesh-control-plane-resource-file_ossm-migrating-premigration-checklists)
 
-oc apply -f otel-collector.yaml
-oc apply -f tempo-rolebindings.yaml
-oc apply -f 2.2.smcp-disabled-extensions.yaml
-oc apply -f telemetry.yaml
-oc apply -f kiali.yaml
-oc apply -f monitoring.yaml
+cat otel-collector.yaml | sed "s/_TEMPO_NAMESPACE_/$TEMPO_NS/g" | oc -n ${CONTROL_PLANE_NS} apply -f-
+oc -n ${CONTROL_PLANE_NS} apply -f telemetry.yaml
+oc -n ${CONTROL_PLANE_NS} apply -f monitoring-control-plane.yaml
+
+cat tempo-clusterrolebindings.yaml | sed "s/_TENANT_/$TENANT/g" | sed "s/_TEMPO_NAMESPACE_/$TEMPO_NS/g" | sed "s/_CONTROL_PLANE_/$CONTROL_PLANE_NS/g" | oc apply -f-
+
+cat smcp-disabled-extensions.yaml |  sed "s/_TEMPO_NAMESPACE_/$TEMPO_NS/g" | oc -n ${CONTROL_PLANE_NS} apply -f-
+
+cat kiali.yaml | sed "s/_CONTROL_PLANE_/$CONTROL_PLANE_NS/g" | sed "s/_TENANT_/$TENANT/g" | sed "s/_TEMPO_NAMESPACE_/$TEMPO_NS/g" | sed "s/_CLUSTER_DNS_/$CLUSTER_DNS/g" | oc -n ${CONTROL_PLANE_NS} apply -f-
 
 # Para borrar el pod del elasticsearch
-oc delete pvc --all 
+oc -n ${CONTROL_PLANE_NS} delete pvc --all 
 
-# solo una vez, es comun para todos los istios
-oc create ns istio-cni
-oc apply -f istiocni.yaml
+# 3. Creamos el namespace donde irá el ingressgateway
 
-oc apply -f istio.yaml
+## 3.1 Cremos el namespace
+oc create ns ${INGRESS_NS}
+oc label ns ${INGRESS_NS} istio.io/rev=${CONTROL_PLANE_NS}
 
-oc label namespace bookinfo istio.io/rev=test-smcp-v2
+## 3.2 Desplegamos el ingress, para pruebas podemos tambien exponer el servicio con 
+## oc -n ${INGRESS_NS} expose svc/ingressgateway --port=http2
+oc -n ${INGRESS_NS} apply -f ingressgateway.yaml
 
-oc create ns test-smcp-v2-ingress
-oc label namespace test-smcp-v2-ingress istio.io/rev=test-smcp-v2
-oc -n test-smcp-v2-ingress apply -f ingressgateway-v3.yaml
-oc delete -f 2.1.ingressgateway-migration.yaml
-oc delete svc istio-ingressgateway
+
+cat istio.yaml | sed "s/_CONTROL_PLANE_/$CONTROL_PLANE_NS/g" | oc apply -f-
+
+
+oc label ns ${DATA_PLANE_NS} istio.io/rev=${CONTROL_PLANE_NS}
+
+oc -n ${CONTROL_PLANE_NS} delete -f ingressgateway-migration.yaml
+oc -n ${CONTROL_PLANE_NS} delete svc istio-ingressgateway
 
 # en la doc ponia labelear para que no inyecte el v2 pero 
 # oc label ns bookinfo maistra.io/ignore-namespace=true

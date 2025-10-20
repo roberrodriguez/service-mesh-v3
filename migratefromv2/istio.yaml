@@ -1,13 +1,13 @@
 apiVersion: sailoperator.io/v1
 kind: Istio
 metadata:
-  name: test-smcp-v2
+  name: _CONTROL_PLANE_
 spec:
-  namespace: test-smcp-v2
+  namespace: _CONTROL_PLANE_
   values:
     pilot:
       autoscaleMin: 1
-      autoscaleMax: 5 
+      autoscaleMax: 5
       cpu:
         targetAverageUtilization: 80 
       memory:
@@ -18,7 +18,8 @@ spec:
       - name: otel
         opentelemetry:
           port: 4317
-          service: otel-collector.test-smcp-v2.svc.cluster.local 
+          service: otel-collector._CONTROL_PLANE_.svc.cluster.local 
       discoverySelectors:
         - matchLabels:
-            mesh: test-smcp-v2
+            istio.io/rev: _CONTROL_PLANE_
+

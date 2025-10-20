@@ -1,26 +1,9 @@
 # https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html/observability/metrics-and-service-mesh#ossm-config-openshift-monitoring-only_ossm-metrics
 
-
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  name: istiod-monitor
-  namespace: test-smcp-v2
-spec:
-  targetLabels:
-  - app
-  selector:
-    matchLabels:
-      istio: pilot
-  endpoints:
-  - port: http-monitoring
-    interval: 30s
----
 apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
 metadata:
-  name: bookinfo-proxies-monitor
-  namespace: bookinfo
+  name: istio-proxies-monitor
 spec:
   selector:
     matchExpressions:

@@ -2,7 +2,6 @@ apiVersion: maistra.io/v2
 kind: ServiceMeshControlPlane
 metadata:
   name: ossm-controlplane-v2
-  namespace: test-smcp-v2
 spec:
   security:
     managedNetworkPolicy: false
@@ -29,4 +28,4 @@ spec:
     - name: otel
       opentelemetry:
         port: 4317
-        service: otel-collector.test-smcp-v2.svc.cluster.local 
+        service: otel-collector._TEMPO_NAMESPACE_.svc.cluster.local 
