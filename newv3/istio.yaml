@@ -22,10 +22,4 @@ spec:
       discoverySelectors:
         - matchLabels:
             istio.io/rev: test-istio-v3
----
-apiVersion: sailoperator.io/v1
-kind: IstioCNI
-metadata:
-  name: default
-spec:
-  namespace: istio-cni
+

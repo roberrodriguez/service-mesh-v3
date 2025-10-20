@@ -8,9 +8,12 @@ oc create secret generic cacert \
   -n test-istio-v3
 
 
+# solo una vez, es comun para todos los istios
+oc create ns istio-cni
+oc apply -f istiocni.yaml
+
 # Crear namespaces
 oc create ns test-istio-v3
-oc create ns istio-cni
 oc create ns bookinfo-v3
 oc create ns istio-tempo
 
