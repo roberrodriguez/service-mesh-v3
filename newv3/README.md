@@ -29,7 +29,7 @@ cat otel-collector.yaml | sed "s/_TEMPO_NAMESPACE_/$TEMPO_NS/g" | oc -n ${CONTRO
 oc -n ${CONTROL_PLANE_NS} apply -f telemetry.yaml
 oc -n ${CONTROL_PLANE_NS} apply -f monitoring-control-plane.yaml
 
-cat tempo-clusterrolebindings.yaml | sed "s/_TENANT_/$TENANT/g" | sed "s/_TEMPO_NAMESPACE_/$TEMPO_NS/g" | oc apply -f-
+cat tempo-clusterrolebindings.yaml | sed "s/_TENANT_/$TENANT/g" | sed "s/_TEMPO_NAMESPACE_/$TEMPO_NS/g" | sed "s/_CONTROL_PLANE_/$CONTROL_PLANE_NS/g" | oc apply -f-
 
 cat kiali.yaml | sed "s/_CONTROL_PLANE_/$CONTROL_PLANE_NS/g" | sed "s/_TENANT_/$TENANT/g" | oc -n ${CONTROL_PLANE_NS} apply -f-
 
