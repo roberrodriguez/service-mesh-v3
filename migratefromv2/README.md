@@ -3,11 +3,7 @@
 # Crear namespaces
 oc create ns test-smcp-v2
 oc create ns bookinfo
-# oc create ns istio-tempo
 
-oc label namespace bookinfo istio-injection=enabled
-
-# oc apply -f tempo-stack
 oc apply -f smcp-orig.yaml
 oc apply -f smmr.yaml
 
@@ -25,8 +21,17 @@ done
 
 # 2. MIGRACION
 
+## 2.0 definir variables
+
+CONTROL_PLANE_NS=test-smcp-v2
+INGRESS_NS=${CONTROL_PLANE_NS}-ingress
+DATA_PLANE_NS=bookinfo
+TEMPO_NS=istio-tempo
+TENANT=dev
+CLUSTER_DNS=ocp4poc.example.com
+
 ## 2.1 Migrar la istio-ingressgateways (https://docs.redhat.com/en/documentation/openshift_container_platform/4.17/html/service_mesh/service-mesh-2-x#ossm-about-gateway-migration_gateway-migration)
-oc apply -f 2.1.ingressgateway-migration.yaml
+oc -n ${CONTROL_PLANE_NS} apply -f ingressgateway-migration.yaml
 oc scale deploy istio-ingressgateway --replicas=0
 
 oc label service istio-ingressgateway app.kubernetes.io/managed-by-
