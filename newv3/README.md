@@ -21,6 +21,7 @@ oc apply -f istio.yaml
 oc apply -f otel-collector.yaml
 oc apply -f tempo-rolebindings.yaml
 oc apply -f telemetry.yaml
+oc apply -f kiali.yaml
 
 oc apply -f https://raw.githubusercontent.com/openshift-service-mesh/istio/release-1.24/samples/bookinfo/platform/kube/bookinfo.yaml -n bookinfo-v3
 
