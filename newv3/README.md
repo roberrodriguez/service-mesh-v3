@@ -7,6 +7,10 @@ oc create secret generic cacert \
   --from-file=ca.crt=custom-ca.crt \
   -n test-istio-v3
 
+# 0. Prerequisitos
+## - Tener creado un TempoStack para guardar las trazas (carpeta tempo)
+## - Haber creardo un IstioCNI (carpeta istio-cni)
+
 # 1. Definimos las variables
 
 CONTROL_PLANE_NS=test-istio-v3
