@@ -105,3 +105,39 @@ oc -n ${CONTROL_PLANE_NS} delete smcp --all
 oc label ns ${DATA_PLANE_NS} maistra.io/ignore-namespace-
 oc -n ${CONTROL_PLANE_NS} delete -f ingressgateway-migration.yaml
 oc -n ${CONTROL_PLANE_NS} delete svc istio-ingressgateway
+
+# 4. Desinstalar operadores de SM2 
+
+# Una vez migrados todos los mesh se pueden desinstalar los operadores que ya no son necesarios
+# - Red Hat OpenShift Service Mesh 2
+# - Red Hat OpenShift distributed tracing platform
+# - OpenShift Elasticsearch Operator
+
+
+# [rrodri11@bastionk8s migratefromv2]$ oc get crd -l maistra-version
+# NAME                                            CREATED AT
+# exportedservicesets.federation.maistra.io       2025-10-13T12:01:42Z
+# importedservicesets.federation.maistra.io       2025-10-13T12:01:42Z
+# servicemeshcontrolplanes.maistra.io             2025-10-13T11:46:20Z
+# servicemeshmemberrolls.maistra.io               2025-10-13T11:46:21Z
+# servicemeshmembers.maistra.io                   2025-10-13T11:46:21Z
+# servicemeshpeers.federation.maistra.io          2025-10-13T12:01:42Z
+# servicemeshpolicies.authentication.maistra.io   2025-10-13T12:01:42Z
+# servicemeshrbacconfigs.rbac.maistra.io          2025-10-13T12:01:42Z
+# [rrodri11@bastionk8s migratefromv2]$ 
+
+# [rrodri11@bastionk8s migratefromv2]$ oc get crd -l name=jaeger-operator
+# NAME                       CREATED AT
+# jaegers.jaegertracing.io   2025-10-13T11:17:24Z
+# [rrodri11@bastionk8s migratefromv2]$
+
+# [rrodri11@bastionk8s migratefromv2]$ oc get crd -l name=elasticsearch-operator
+# NAME                                   CREATED AT
+# elasticsearches.logging.openshift.io   2025-10-13T11:44:58Z
+# kibanas.logging.openshift.io           2025-10-13T11:44:58Z
+# [rrodri11@bastionk8s migratefromv2]$
+
+# y después borrar los crds que se han quedado
+oc delete crd -l name=jaeger-operator
+oc delete crd -l maistra-version
+oc delete crd -l name=elasticsearch-operator
