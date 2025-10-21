@@ -81,7 +81,7 @@ oc -n ${CONTROL_PLANE_NS} delete smcp --all
 
 
 ## 3.2 Desplegamos el ingress, para pruebas podemos tambien exponer el servicio con 
-oc -n ${INGRESS_NS} apply -f ingressgateway.yaml
+cat ingressgateway.yaml | sed "s/_CONTROL_PLANE_/$CONTROL_PLANE_NS/g" | oc -n ${INGRESS_NS} apply -f-
 
 
 ## 3.3 Mover rutas del control plane al namespace de ingress
