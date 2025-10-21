@@ -74,3 +74,8 @@ oc apply -f https://raw.githubusercontent.com/openshift-service-mesh/istio/relea
 oc apply -f https://raw.githubusercontent.com/openshift-service-mesh/istio/release-1.24/samples/bookinfo/networking/bookinfo-gateway.yaml -n ${DATA_PLANE_NS}
 
 
+# Cambiar selector de los gateways
+for f in $(oc -n ${DATA_PLANE_NS} get gateway -o custom-columns=NAME:.metadata.name --no-headers)
+do 
+    oc -n ${DATA_PLANE_NS} patch gateway $f --type='merge' -p "{\"spec\":{\"selector\":{\"istio\":\"ingressgateway-${CONTROL_PLANE_NS}\"}}}"
+done

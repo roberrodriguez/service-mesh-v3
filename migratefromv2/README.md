@@ -107,5 +107,11 @@ do
     oc -n ${DATA_PLANE_NS} patch deploy $f --type json -p='[{"op": "remove", "path": "/spec/template/metadata/annotations/sidecar.istio.io~1inject"}]'
 done
 
+# Cambiar selector de los gateways
+for f in $(oc -n ${DATA_PLANE_NS} get gateway -o custom-columns=NAME:.metadata.name --no-headers)
+do 
+    oc -n ${DATA_PLANE_NS} patch gateway $f --type='merge' -p "{\"spec\":{\"selector\":{\"istio\":\"ingressgateway-${CONTROL_PLANE_NS}\"}}}"
+done
+
 
 # oc rollout restart deployments -n bookinfo
