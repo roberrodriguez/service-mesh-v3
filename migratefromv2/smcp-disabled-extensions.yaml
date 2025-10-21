@@ -4,7 +4,7 @@ metadata:
   name: ossm-controlplane-v2
 spec:
   security:
-    managedNetworkPolicy: false
+    manageNetworkPolicy: false
   tracing:
     type: None
   gateways:

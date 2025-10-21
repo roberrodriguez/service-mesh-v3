@@ -67,19 +67,6 @@ cat istio.yaml | sed "s/_CONTROL_PLANE_/$CONTROL_PLANE_NS/g" | oc apply -f-
 oc create ns ${INGRESS_NS}
 oc label ns ${INGRESS_NS} istio.io/rev=${CONTROL_PLANE_NS}
 
-# Teoricamente con ignore-namespace habria de funcionar pero no funciona hasta no borrar el smmr y el smcp
-# oc label ns ${INGRESS_NS} maistra.io/ignore-namespace=true
-
-# [rrodri11@bastionk8s migratefromv2]$ oc -n ${INGRESS_NS} get event --sort-by lastTimestamp
-# LAST SEEN   TYPE      REASON              OBJECT                                       MESSAGE
-# 71s         Normal    ScalingReplicaSet   deployment/istio-ingressgateway              Scaled up replica set istio-ingressgateway-57ffdb878d to 1
-# 1s          Warning   FailedCreate        replicaset/istio-ingressgateway-57ffdb878d   Error creating: Internal error occurred: failed calling webhook "rev.namespace.sidecar-injector.istio.io": failed to call webhook: Post "https://istiod-test-smcp-v2.test-smcp-v2.svc:443/inject?timeout=10s": context deadline exceeded
-# [rrodri11@bastionk8s migratefromv2]$
-#
-oc -n ${CONTROL_PLANE_NS} delete smmr --all
-oc -n ${CONTROL_PLANE_NS} delete smcp --all
-
-
 ## 3.2 Desplegamos el ingress, para pruebas podemos tambien exponer el servicio con 
 cat ingressgateway.yaml | sed "s/_CONTROL_PLANE_/$CONTROL_PLANE_NS/g" | oc -n ${INGRESS_NS} apply -f-
 
@@ -95,17 +82,7 @@ done
 # 4. Migrar datos data plane
 
 oc label ns ${DATA_PLANE_NS} istio.io/rev=${CONTROL_PLANE_NS}
-
-oc -n ${CONTROL_PLANE_NS} delete -f ingressgateway-migration.yaml
-oc -n ${CONTROL_PLANE_NS} delete svc istio-ingressgateway
-
-
-
-# Quitar la annotation para inyectar sidecars
-for f in $(oc -n ${DATA_PLANE_NS} get deploy --no-headers -o custom-columns=":metadata.name"); 
-do 
-    oc -n ${DATA_PLANE_NS} patch deploy $f --type json -p='[{"op": "remove", "path": "/spec/template/metadata/annotations/sidecar.istio.io~1inject"}]'
-done
+oc label ns ${DATA_PLANE_NS} maistra.io/ignore-namespace=true
 
 # Cambiar selector de los gateways
 for f in $(oc -n ${DATA_PLANE_NS} get gateway -o custom-columns=NAME:.metadata.name --no-headers)
@@ -113,5 +90,18 @@ do
     oc -n ${DATA_PLANE_NS} patch gateway $f --type='merge' -p "{\"spec\":{\"selector\":{\"istio\":\"ingressgateway-${CONTROL_PLANE_NS}\"}}}"
 done
 
+# Opcional. Quitar la annotation para inyectar sidecars. Esta deprecada y ahora se deberia poner como label
+# Ademas ahora por defecto se inyecta el sidecar, sino se desea se ha deponer la label sidecar.istio.io/inject=false
+for f in $(oc -n ${DATA_PLANE_NS} get deploy --no-headers -o custom-columns=":metadata.name"); 
+do 
+    oc -n ${DATA_PLANE_NS} patch deploy $f --type json -p='[{"op": "remove", "path": "/spec/template/metadata/annotations/sidecar.istio.io~1inject"}]'
+done
 
 # oc rollout restart deployments -n bookinfo
+
+# Limpiar v2
+oc -n ${CONTROL_PLANE_NS} delete smmr --all
+oc -n ${CONTROL_PLANE_NS} delete smcp --all
+oc label ns ${DATA_PLANE_NS} maistra.io/ignore-namespace-
+oc -n ${CONTROL_PLANE_NS} delete -f ingressgateway-migration.yaml
+oc -n ${CONTROL_PLANE_NS} delete svc istio-ingressgateway
