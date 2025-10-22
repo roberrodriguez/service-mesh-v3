@@ -6,12 +6,14 @@ spec:
   namespace: _CONTROL_PLANE_
   values:
     pilot:
-      autoscaleMin: 1
-      autoscaleMax: 5
-      cpu:
-        targetAverageUtilization: 80 
-      memory:
-        targetAverageUtilization: 80 
+      replicaCount: 2
+      resources:
+        requests:
+          cpu: 500m
+          memory: 2Gi
+        limits:
+          cpu: 500m
+          memory: 2Gi
     meshConfig:
       enableTracing: true
       extensionProviders:

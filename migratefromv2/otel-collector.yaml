@@ -10,6 +10,13 @@ spec:
   #   maxReplicas: 3
   #   targetCPUUtilization: 50
   #   targetMemoryUtilization: 60
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: 250m
+      memory: 256Mi
   observability:
     metrics:
       enableMetrics: true
