@@ -9,10 +9,10 @@ spec:
       replicaCount: 2
       resources:
         requests:
-          cpu: 500m
+          cpu: 1000m
           memory: 2Gi
         limits:
-          cpu: 1000m
+          cpu: 2000m
           memory: 2Gi
     global:
       proxy:
