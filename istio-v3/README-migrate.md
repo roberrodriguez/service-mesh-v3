@@ -1,29 +1,4 @@
-# 1. CREAR EL SETUP INICIAL
-
-# Crear namespaces
-oc create ns test-smcp-v2
-oc create ns bookinfo
-
-oc apply -f smcp-orig.yaml
-oc apply -f smmr.yaml
-
-oc expose svc/istio-ingressgateway --port=http2
-
-oc apply -f https://raw.githubusercontent.com/openshift-service-mesh/istio/release-1.24/samples/bookinfo/platform/kube/bookinfo.yaml -n bookinfo
-
-oc apply -f https://raw.githubusercontent.com/openshift-service-mesh/istio/release-1.24/samples/bookinfo/networking/bookinfo-gateway.yaml -n bookinfo
-
-# Añadir la annotation para inyectar sidecars
-for f in $(oc -n bookinfo get deploy --no-headers -o custom-columns=":metadata.name"); 
-do 
-    oc -n bookinfo patch deploy $f --type merge -p '{"spec":{"template":{"metadata":{"annotations":{"sidecar.istio.io/inject":"true"}}}}}'
-done
-
-## Podemos acceder a productinfo con http://istio-ingressgateway-test-smcp-v2.apps.ocp4poc.example.com/productpage
-
-# 2. MIGRACION
-
-## 2.0 definir variables
+# 0. definir variables
 
 CONTROL_PLANE_NS=test-smcp-v2
 INGRESS_NS=${CONTROL_PLANE_NS}-ingress
@@ -32,8 +7,33 @@ TEMPO_NS=istio-tempo
 TENANT=dev
 CLUSTER_DNS=ocp4poc.example.com
 
+# 1. CREAR EL SETUP INICIAL
+
+# Crear namespaces
+oc create ns ${CONTROL_PLANE_NS}
+oc create ns ${DATA_PLANE_NS}
+
+oc -n ${CONTROL_PLANE_NS} apply -f migratefromv2/smcp-orig.yaml
+oc -n ${CONTROL_PLANE_NS} apply -f migratefromv2/smmr.yaml
+
+oc -n ${CONTROL_PLANE_NS} expose svc/istio-ingressgateway --port=http2
+
+oc apply -f https://raw.githubusercontent.com/openshift-service-mesh/istio/release-1.24/samples/bookinfo/platform/kube/bookinfo.yaml -n ${CONTROL_PLANE_NS}
+
+oc apply -f https://raw.githubusercontent.com/openshift-service-mesh/istio/release-1.24/samples/bookinfo/networking/bookinfo-gateway.yaml -n ${CONTROL_PLANE_NS}
+
+# Añadir la annotation para inyectar sidecars
+for f in $(oc -n ${CONTROL_PLANE_NS} get deploy --no-headers -o custom-columns=":metadata.name"); 
+do 
+    oc -n ${CONTROL_PLANE_NS} patch deploy $f --type merge -p '{"spec":{"template":{"metadata":{"annotations":{"sidecar.istio.io/inject":"true"}}}}}'
+done
+
+## Podemos acceder a productinfo con http://istio-ingressgateway-test-smcp-v2.apps.ocp4poc.example.com/productpage
+
+# 2. MIGRACION
+
 ## 2.1 Migrar la istio-ingressgateways (https://docs.redhat.com/en/documentation/openshift_container_platform/4.17/html/service_mesh/service-mesh-2-x#ossm-about-gateway-migration_gateway-migration)
-oc -n ${CONTROL_PLANE_NS} apply -f ingressgateway-migration.yaml
+oc -n ${CONTROL_PLANE_NS} apply -f migratefromv2/ingressgateway-migration.yaml
 oc -n ${CONTROL_PLANE_NS} scale deploy istio-ingressgateway --replicas=0
 
 oc -n ${CONTROL_PLANE_NS} label service istio-ingressgateway app.kubernetes.io/managed-by-
@@ -49,11 +49,11 @@ oc -n ${CONTROL_PLANE_NS} apply -f monitoring-control-plane.yaml
 
 cat tempo-clusterrolebindings.yaml | sed "s/_TENANT_/$TENANT/g" | sed "s/_TEMPO_NAMESPACE_/$TEMPO_NS/g" | sed "s/_CONTROL_PLANE_/$CONTROL_PLANE_NS/g" | oc apply -f-
 
-cat smcp-disabled-extensions.yaml |  sed "s/_TEMPO_NAMESPACE_/$TEMPO_NS/g" | oc -n ${CONTROL_PLANE_NS} apply -f-
+cat migratefromv2/smcp-disabled-extensions.yaml |  sed "s/_TEMPO_NAMESPACE_/$TEMPO_NS/g" | oc -n ${CONTROL_PLANE_NS} apply -f-
 
 cat kiali.yaml | sed "s/_CONTROL_PLANE_/$CONTROL_PLANE_NS/g" | sed "s/_TENANT_/$TENANT/g" | sed "s/_TEMPO_NAMESPACE_/$TEMPO_NS/g" | sed "s/_CLUSTER_DNS_/$CLUSTER_DNS/g" | oc -n ${CONTROL_PLANE_NS} apply -f-
 
-# Para borrar el pod del elasticsearch
+# Para borrar el pvc del elasticsearch
 oc -n ${CONTROL_PLANE_NS} delete pvc --all 
 
 oc label ns ${CONTROL_PLANE_NS} istio.io/rev=${CONTROL_PLANE_NS}
