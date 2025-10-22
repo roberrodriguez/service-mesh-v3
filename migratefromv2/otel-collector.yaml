@@ -14,10 +14,9 @@ spec:
     metrics:
       enableMetrics: true
   deploymentUpdateStrategy: {}
+  podAnnotations:
+    sidecar.istio.io/inject: "false"
   config:
-    deployment:
-      labels:
-        sidecar.istio.io/inject: "false"
     exporters:
       otlp:
         endpoint: 'tempo-istio-tempostack-gateway._TEMPO_NAMESPACE_.svc:8090'
