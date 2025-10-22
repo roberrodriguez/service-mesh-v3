@@ -72,14 +72,6 @@ oc label ns ${INGRESS_NS} istio.io/rev=${CONTROL_PLANE_NS}
 oc -n ${INGRESS_NS} apply -f ingressgateway.yaml
 
 
-## 3.3 Mover rutas del control plane al namespace de ingress
-
-for f in $(oc -n ${CONTROL_PLANE_NS} get route --output=jsonpath='{range .items[?(@.spec.to.name=="istio-ingressgateway")]}{.metadata.name}{"\n"}{end}')
-do 
-    oc -n ${CONTROL_PLANE_NS} get route $f -o yaml | yq 'del(.metadata.namespace)' | oc -n ${INGRESS_NS} apply -f -
-    oc -n ${CONTROL_PLANE_NS} delete route $f
-done
-
 # 4. Migrar datos data plane
 
 oc label ns ${DATA_PLANE_NS} istio.io/rev=${CONTROL_PLANE_NS}
@@ -94,12 +86,24 @@ done
 
 # oc rollout restart deployments -n bookinfo
 
-# Limpiar v2
+# 6. Mover rutas del control plane al namespace de ingress
+
+for f in $(oc -n ${CONTROL_PLANE_NS} get route --output=jsonpath='{range .items[?(@.spec.to.name=="istio-ingressgateway")]}{.metadata.name}{"\n"}{end}')
+do 
+    oc -n ${CONTROL_PLANE_NS} get route $f -o yaml | yq 'del(.metadata.namespace)' | oc -n ${INGRESS_NS} apply -f -
+    oc -n ${CONTROL_PLANE_NS} delete route $f
+done
+
+
+# 5. Limpiar v2
 oc -n ${CONTROL_PLANE_NS} delete smmr --all
 oc -n ${CONTROL_PLANE_NS} delete smcp --all
 oc label ns ${DATA_PLANE_NS} maistra.io/ignore-namespace-
 oc -n ${CONTROL_PLANE_NS} delete -f ingressgateway-migration.yaml
 oc -n ${CONTROL_PLANE_NS} delete svc istio-ingressgateway
+
+
+
 
 # 4. Desinstalar operadores de SM2 
 
