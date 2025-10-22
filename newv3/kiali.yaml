@@ -28,7 +28,7 @@ spec:
           istio.io/rev: _CONTROL_PLANE_
     resources:
       limits:
-        cpu: 300m
+        cpu: 600m
         memory: 1Gi
       requests:
         cpu: 300m
