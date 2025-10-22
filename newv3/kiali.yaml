@@ -20,6 +20,8 @@ metadata:
 spec:
   deployment:
     cluster_wide_access: false
+    pod_labels:
+      sidecar.istio.io/inject: "false"
     discovery_selectors:
       default:
       - matchLabels:
