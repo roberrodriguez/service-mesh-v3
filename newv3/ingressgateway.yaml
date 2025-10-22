@@ -56,6 +56,13 @@ spec:
           - containerPort: 15090
             protocol: TCP
             name: http-envoy-prom
+          resources:
+            requests:
+              cpu: 600m
+              memory: 384Mi
+            limits:
+              cpu: 600m
+              memory: 384Mi
       securityContext:
         sysctls:
         - name: net.ipv4.ip_unprivileged_port_start
