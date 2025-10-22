@@ -53,8 +53,8 @@ oc create ns ${INGRESS_NS}
 oc label ns ${INGRESS_NS} istio.io/rev=${CONTROL_PLANE_NS}
 
 ## 3.2 Desplegamos el ingress, para pruebas podemos tambien exponer el servicio con 
-## oc -n ${INGRESS_NS} expose svc/ingressgateway --port=http2
-cat ingressgateway.yaml | sed "s/_CONTROL_PLANE_/$CONTROL_PLANE_NS/g" | oc -n ${INGRESS_NS} apply -f-
+## oc -n ${INGRESS_NS} expose svc/istio-ingressgateway --port=http2
+oc -n ${INGRESS_NS} apply -f ingressgateway.yaml
 
 
 # 4. Creamos el o los namespaces de aplicacion
@@ -72,10 +72,3 @@ oc -n ${DATA_PLANE_NS} apply -f monitoring-data-plane.yaml
 ## 4.3 Desplegamos la aplicación como tal
 oc apply -f https://raw.githubusercontent.com/openshift-service-mesh/istio/release-1.24/samples/bookinfo/platform/kube/bookinfo.yaml -n ${DATA_PLANE_NS}
 oc apply -f https://raw.githubusercontent.com/openshift-service-mesh/istio/release-1.24/samples/bookinfo/networking/bookinfo-gateway.yaml -n ${DATA_PLANE_NS}
-
-
-# Cambiar selector de los gateways
-for f in $(oc -n ${DATA_PLANE_NS} get gateway -o custom-columns=NAME:.metadata.name --no-headers)
-do 
-    oc -n ${DATA_PLANE_NS} patch gateway $f --type='merge' -p "{\"spec\":{\"selector\":{\"istio\":\"ingressgateway-${CONTROL_PLANE_NS}\"}}}"
-done

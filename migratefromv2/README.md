@@ -68,7 +68,8 @@ oc create ns ${INGRESS_NS}
 oc label ns ${INGRESS_NS} istio.io/rev=${CONTROL_PLANE_NS}
 
 ## 3.2 Desplegamos el ingress, para pruebas podemos tambien exponer el servicio con 
-cat ingressgateway.yaml | sed "s/_CONTROL_PLANE_/$CONTROL_PLANE_NS/g" | oc -n ${INGRESS_NS} apply -f-
+# oc -n ${INGRESS_NS} expose svc/istio-ingressgateway --port=http2
+oc -n ${INGRESS_NS} apply -f ingressgateway.yaml
 
 
 ## 3.3 Mover rutas del control plane al namespace de ingress
@@ -83,12 +84,6 @@ done
 
 oc label ns ${DATA_PLANE_NS} istio.io/rev=${CONTROL_PLANE_NS}
 oc label ns ${DATA_PLANE_NS} maistra.io/ignore-namespace=true
-
-# Cambiar selector de los gateways
-for f in $(oc -n ${DATA_PLANE_NS} get gateway -o custom-columns=NAME:.metadata.name --no-headers)
-do 
-    oc -n ${DATA_PLANE_NS} patch gateway $f --type='merge' -p "{\"spec\":{\"selector\":{\"istio\":\"ingressgateway-${CONTROL_PLANE_NS}\"}}}"
-done
 
 # Opcional. Quitar la annotation para inyectar sidecars. Esta deprecada y ahora se deberia poner como label
 # Ademas ahora por defecto se inyecta el sidecar, sino se desea se ha deponer la label sidecar.istio.io/inject=false

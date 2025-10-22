@@ -32,13 +32,13 @@ metadata:
 spec:
   selector:
     matchLabels:
-      istio: ingressgateway-_CONTROL_PLANE_
+      istio: ingressgateway
   template:
     metadata:
       annotations:
         inject.istio.io/templates: gateway 
       labels:
-        istio: ingressgateway-_CONTROL_PLANE_
+        istio: ingressgateway
         sidecar.istio.io/inject: "true" 
     spec:
       containers:
@@ -69,7 +69,7 @@ metadata:
 spec:
   type: ClusterIP 
   selector:
-    istio: ingressgateway-_CONTROL_PLANE_
+    istio: ingressgateway
   ports:
     - name: status-port
       port: 15021
