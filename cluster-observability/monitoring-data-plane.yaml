@@ -2,8 +2,6 @@ apiVersion: monitoring.rhobs/v1
 kind: PodMonitor
 metadata:
   name: istio-proxies-monitor
-  labels:
-    monitoring: "monitoring-stack"
 spec:
   selector:
     matchExpressions:
@@ -44,5 +42,5 @@ spec:
       action: replace
       targetLabel: namespace
     - action: replace
-      replacement: "the-mesh-identification-string" 
+      replacement: "_CONTROL_PLANE_" 
       targetLabel: mesh_id

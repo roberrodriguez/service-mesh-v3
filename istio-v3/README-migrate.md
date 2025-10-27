@@ -77,6 +77,10 @@ oc -n ${INGRESS_NS} apply -f ingressgateway.yaml
 oc label ns ${DATA_PLANE_NS} istio.io/rev=${CONTROL_PLANE_NS}
 oc label ns ${DATA_PLANE_NS} maistra.io/ignore-namespace=true
 
+## Desplegamos el pod monitor para recoger métricas de los istio-proxy
+cat monitoring-data-plane.yaml | sed "s/_CONTROL_PLANE_/$CONTROL_PLANE_NS/g" | oc -n ${DATA_PLANE_NS} apply -f-
+
+
 # Opcional. Quitar la annotation para inyectar sidecars. Esta deprecada y ahora se deberia poner como label
 # Ademas ahora por defecto se inyecta el sidecar, sino se desea se ha deponer la label sidecar.istio.io/inject=false
 for f in $(oc -n ${DATA_PLANE_NS} get deploy --no-headers -o custom-columns=":metadata.name"); 

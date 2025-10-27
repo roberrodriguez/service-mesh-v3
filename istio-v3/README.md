@@ -63,7 +63,7 @@ oc create ns ${DATA_PLANE_NS}
 oc label ns ${DATA_PLANE_NS} istio.io/rev=${CONTROL_PLANE_NS}
 
 # 4.2 Desplegamos el pod monitor para recoger métricas de los istio-proxy
-oc -n ${DATA_PLANE_NS} apply -f monitoring-data-plane.yaml
+cat monitoring-data-plane.yaml | sed "s/_CONTROL_PLANE_/$CONTROL_PLANE_NS/g" | oc -n ${DATA_PLANE_NS} apply -f-
 
 ## Se inyectará el sidecar a todos los pods, si no los queremos, se le tiene que poner la label 
 ##  sidecar.istio.io/inject=false

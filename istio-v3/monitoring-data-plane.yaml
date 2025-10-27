@@ -44,5 +44,5 @@ spec:
       action: replace
       targetLabel: namespace
     - action: replace
-      replacement: "the-mesh-identification-string" 
+      replacement: "_CONTROL_PLANE_" 
       targetLabel: mesh_id

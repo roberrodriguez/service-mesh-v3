@@ -9,7 +9,5 @@ spec:
   retention: 3d
   namespaceSelector:
     matchLabels:
-      monitoring.rhobs/stack: "monitoring-stack"
-  resourceSelector:
-    matchLabels:
-      monitoring: "monitoring-stack"
+      istio.io/rev: _CONTROL_PLANE_
+  resourceSelector: {}
