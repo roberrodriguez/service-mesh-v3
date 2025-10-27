@@ -9,6 +9,11 @@ spec:
   retention: 3d
   prometheusConfig:
     replicas: 1
+    persistentVolumeClaim:
+      storageClassName: nfs-csi
+      resources:
+        requests:
+          storage: 2Gi
   resourceSelector: {}
   resources:
     limits:
