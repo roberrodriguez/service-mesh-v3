@@ -7,7 +7,16 @@ spec:
     disabled: true
   logLevel: debug
   retention: 3d
+  prometheusConfig:
+    replicas: 2
+  resourceSelector: {}
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
   namespaceSelector:
     matchLabels:
       istio.io/rev: _CONTROL_PLANE_
-  resourceSelector: {}

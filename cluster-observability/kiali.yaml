@@ -1,0 +1,62 @@
+# https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html/observability/kiali-operator-provided-by-red-hat#ossm-config-openshift-monitoring-kiali_ossm-kiali
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kiali-_CONTROL_PLANE_-monitoring
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-monitoring-view
+subjects:
+- kind: ServiceAccount
+  name: kiali-service-account
+  namespace: _CONTROL_PLANE_
+---
+apiVersion: kiali.io/v1alpha1
+kind: Kiali
+metadata:
+  name: kiali
+spec:
+  deployment:
+    cluster_wide_access: false
+    pod_labels:
+      sidecar.istio.io/inject: "false"
+    discovery_selectors:
+      default:
+      - matchLabels:
+          istio.io/rev: _CONTROL_PLANE_
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+      requests:
+        cpu: 500m
+        memory: 1Gi
+  # deployment:
+  #   replicas: 2
+  external_services:
+    grafana:
+      enabled: false
+    prometheus:
+      auth:
+        type: bearer
+        use_kiali_token: true
+      thanos_proxy:
+        enabled: true
+      url: https://monitoring-stack-prometheus.test-smcp-v2-monitoring-stack.svc.cluster.local:9090
+    tracing:
+      enabled: true
+      provider: tempo
+      use_grpc: false
+      namespace_selector: true
+      internal_url: https://tempo-istio-tempostack-gateway._TEMPO_NAMESPACE_.svc.cluster.local:8080/api/traces/v1/_TENANT_/tempo
+      external_url: https://tempo-istio-tempostack-gateway-_TEMPO_NAMESPACE_.apps._CLUSTER_DNS_/api/traces/v1/_TENANT_/search
+      health_check_url: https://tempo-istio-tempostack-gateway._TEMPO_NAMESPACE_.apps._CLUSTER_DNS_/api/traces/v1/_TENANT_/tempo/api/echo
+      auth:
+        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+        insecure_skip_verify: false
+        type: bearer
+        use_kiali_token: true
+      tempo_config:
+         url_format: "jaeger"

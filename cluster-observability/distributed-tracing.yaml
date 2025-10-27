@@ -1,0 +1,8 @@
+# https://docs.redhat.com/fr/documentation/red_hat_openshift_cluster_observability_operator/1-latest/html/ui_plugins_for_red_hat_openshift_cluster_observability_operator/distributed-tracing-ui-plugin
+
+apiVersion: observability.openshift.io/v1alpha1
+kind: UIPlugin
+metadata:
+  name: distributed-tracing
+spec:
+  type: DistributedTracing
