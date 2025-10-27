@@ -3,7 +3,7 @@ kind: ServiceMonitor
 metadata:
   name: istiod-monitor
   labels:
-    istio.io/rev: test-smcp-v2
+    monitoring: "monitoring-stack"
 spec:
   selector:
     matchLabels:

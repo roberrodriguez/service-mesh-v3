@@ -8,4 +8,4 @@ spec:
   logLevel: debug
   retention: 3d
   namespaceSelector:
-    istio.io/rev: test-smcp-v2
+    monitoring: "monitoring-stack"
