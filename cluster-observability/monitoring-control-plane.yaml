@@ -2,6 +2,8 @@ apiVersion: monitoring.rhobs/v1
 kind: ServiceMonitor
 metadata:
   name: istiod-monitor
+  labels:
+    istio.io/rev: test-smcp-v2
 spec:
   selector:
     matchLabels:

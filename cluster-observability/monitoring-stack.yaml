@@ -3,6 +3,8 @@ kind: MonitoringStack
 metadata:
   name: monitoring-stack
 spec:
+  alertmanagerConfig:
+    disabled: true
   logLevel: debug
   retention: 3d
   namespaceSelector:
