@@ -8,4 +8,4 @@ spec:
   logLevel: debug
   retention: 3d
   namespaceSelector:
-    monitoring: "monitoring-stack"
+    monitoring.rhobs/stack: "monitoring-stack"
