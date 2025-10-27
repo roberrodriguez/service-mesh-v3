@@ -2,8 +2,6 @@ apiVersion: monitoring.rhobs/v1
 kind: PodMonitor
 metadata:
   name: istio-proxies-monitor
-  labels:
-    monitoring: "monitoring-stack"
 spec:
   selector:
     matchExpressions:
