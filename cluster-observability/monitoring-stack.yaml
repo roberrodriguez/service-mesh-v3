@@ -8,7 +8,7 @@ spec:
   logLevel: debug
   retention: 3d
   prometheusConfig:
-    replicas: 2
+    replicas: 1
   resourceSelector: {}
   resources:
     limits:
