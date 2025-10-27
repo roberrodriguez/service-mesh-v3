@@ -1,18 +1,5 @@
 # https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html/observability/kiali-operator-provided-by-red-hat#ossm-config-openshift-monitoring-kiali_ossm-kiali
 
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: kiali-_CONTROL_PLANE_-monitoring
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: cluster-monitoring-view
-subjects:
-- kind: ServiceAccount
-  name: kiali-service-account
-  namespace: _CONTROL_PLANE_
----
 apiVersion: kiali.io/v1alpha1
 kind: Kiali
 metadata:
@@ -44,7 +31,7 @@ spec:
         use_kiali_token: true
       thanos_proxy:
         enabled: true
-      url: https://thanos-querier.openshift-monitoring.svc.cluster.local:9091
+      url: http://monitoring-stack-prometheus._CONTROL_PLANE_.svc.cluster.local:9090
     tracing:
       enabled: true
       provider: tempo

@@ -35,8 +35,10 @@ oc -n ${CONTROL_PLANE_NS} apply -f telemetry.yaml
 oc -n ${CONTROL_PLANE_NS} apply -f monitoring-control-plane.yaml
 
 cat tempo-clusterrolebindings.yaml | sed "s/_TENANT_/$TENANT/g" | sed "s/_TEMPO_NAMESPACE_/$TEMPO_NS/g" | sed "s/_CONTROL_PLANE_/$CONTROL_PLANE_NS/g" | oc apply -f-
+cat monitoring-stack.yaml | sed "s/_CONTROL_PLANE_/$CONTROL_PLANE_NS/g" | oc -n ${CONTROL_PLANE_NS} apply -f-
 
 cat kiali.yaml | sed "s/_CONTROL_PLANE_/$CONTROL_PLANE_NS/g" | sed "s/_TENANT_/$TENANT/g" | sed "s/_TEMPO_NAMESPACE_/$TEMPO_NS/g" | sed "s/_CLUSTER_DNS_/$CLUSTER_DNS/g" | oc -n ${CONTROL_PLANE_NS} apply -f-
+
 # El Kiali solo usa el discoverer_selector cuando se instala, si a posteriori se añade algun otro namespace al mesh
 # hay que forzar a que lo recalcule con
 # oc -n ${CONTROL_PLANE_NS} get kiali kiali -o yaml | oc apply -f-

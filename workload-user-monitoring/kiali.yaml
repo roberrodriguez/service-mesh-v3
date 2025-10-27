@@ -44,7 +44,7 @@ spec:
         use_kiali_token: true
       thanos_proxy:
         enabled: true
-      url: http://monitoring-stack-prometheus.test-smcp-v2-monitoring-stack.svc.cluster.local:9090
+      url: https://thanos-querier.openshift-monitoring.svc.cluster.local:9091
     tracing:
       enabled: true
       provider: tempo

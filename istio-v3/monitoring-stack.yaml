@@ -5,7 +5,6 @@ metadata:
 spec:
   alertmanagerConfig:
     disabled: true
-  logLevel: debug
   retention: 3d
   prometheusConfig:
     replicas: 1
