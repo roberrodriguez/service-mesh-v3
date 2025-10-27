@@ -1,8 +1,6 @@
 apiVersion: monitoring.rhobs/v1
 kind: PodMonitor
 metadata:
-  labels:
-    mesh-app: test-smcp-v2
   name: istio-proxies-monitor
 spec:
   selector:

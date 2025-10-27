@@ -6,5 +6,5 @@ spec:
   logLevel: debug
   retention: 3d
   resourceSelector:
-    matchLabels:
-      mesh-app: test-smcp-v2
+    namespaceSelector:
+      istio.io/rev: test-smcp-v2

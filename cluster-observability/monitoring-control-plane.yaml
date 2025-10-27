@@ -1,8 +1,6 @@
 apiVersion: monitoring.rhobs/v1
 kind: ServiceMonitor
 metadata:
-  labels:
-    mesh-app: test-smcp-v2
   name: istiod-monitor
 spec:
   selector:
