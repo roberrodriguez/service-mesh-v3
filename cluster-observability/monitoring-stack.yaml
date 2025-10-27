@@ -10,3 +10,6 @@ spec:
   namespaceSelector:
     matchLabels:
       monitoring.rhobs/stack: "monitoring-stack"
+  resourceSelector:
+    matchLabels:
+      monitoring: "monitoring-stack"
