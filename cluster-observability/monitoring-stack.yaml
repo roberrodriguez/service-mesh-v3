@@ -7,4 +7,4 @@ spec:
   retention: 3d
   resourceSelector:
     matchLabels:
-      k8s-app: prometheus-coo-example-monitor
+      mesh-app: test-smcp-v2
