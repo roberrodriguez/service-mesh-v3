@@ -1,0 +1,74 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: grafana-_CONTROL_PLANE_-traces-read-_TENANT_
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: istio-_TEMPO_NAMESPACE_-traces-read-_TENANT_
+subjects:
+- kind: ServiceAccount
+  name: grafana-sa
+  namespace: _CONTROL_PLANE_
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: Grafana
+metadata:
+  name: grafana
+spec:
+  config:
+    auth:
+      disable_login_form: "false"
+      disable_signout_menu: "false"
+    log:
+      level: info
+      mode: console
+    server:
+      root_url: '%(protocol)s://%(domain)s/'
+  deployment:
+    spec:
+      template:
+        spec:
+          initContainers:
+          - name: datasources
+            image: registry.access.redhat.com/ubi8/ubi-minimal
+            command:
+              - sh
+              - -c
+              - |
+                TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+                mkdir -p /etc/grafana/provisioning/datasources
+                cat <<EOF > /etc/grafana/provisioning/datasources/datasource.yaml
+                apiVersion: 1
+                datasources:
+                  - name: Tempo
+                    type: tempo
+                    access: proxy
+                    url: https://tempo-istio-tempostack-gateway._TEMPO_NAMESPACE_.svc.cluster.local:8080/api/traces/v1/_TENANT_/tempo
+                    isDefault: true
+                    jsonData:
+                      tlsSkipVerify: true
+                      httpHeaderName1: Authorization
+                    secureJsonData:
+                      httpHeaderValue1: "Bearer $TOKEN"
+                  - name: Prometheus
+                    type: prometheus
+                    access: proxy
+                    url: http://monitoring-stack-prometheus._CONTROL_PLANE_.svc.cluster.local:9090
+                    isDefault: false
+                EOF
+            volumeMounts:
+            - mountPath: /etc/grafana/provisioning/datasources
+              name: datasources
+          containers:
+          - name: grafana
+            volumeMounts:
+            - mountPath: /etc/grafana/provisioning/datasources
+              name: datasources
+          volumes:
+          - emptyDir: {}
+            name: datasources
+  route:
+    spec:
+      tls:
+        termination: edge
