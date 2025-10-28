@@ -58,7 +58,7 @@ oc label ns ${INGRESS_NS} istio.io/rev=${CONTROL_PLANE_NS}
 ## oc -n ${INGRESS_NS} expose svc/istio-ingressgateway --port=http2
 oc -n ${INGRESS_NS} apply -f ingressgateway.yaml
 
-cat monitoring-ingress.yaml | sed "s/_CONTROL_PLANE_/$CONTROL_PLANE_NS/g" | oc -n ${DATA_PLANE_NS} apply -f-
+cat monitoring-ingress.yaml | sed "s/_CONTROL_PLANE_/$CONTROL_PLANE_NS/g" | oc -n ${INGRESS_NS} apply -f-
 
 
 # 4. Creamos el o los namespaces de aplicacion
