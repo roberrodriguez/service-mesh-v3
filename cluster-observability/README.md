@@ -1,1 +1,2 @@
+# Istio dashboards https://grafana.com/orgs/istio/dashboards
 cat grafana.yaml | sed "s/_TENANT_/$TENANT/g" | sed "s/_TEMPO_NAMESPACE_/$TEMPO_NS/g" | sed "s/_CONTROL_PLANE_/$CONTROL_PLANE_NS/g" | oc -n $CONTROL_PLANE_NS apply -f-
