@@ -1,11 +1,12 @@
+#!/bin/bash
 # https://medium.com/@yakovbeder/ossm-3-kiali-and-grafana-tempo-the-epic-quest-for-custom-certificates-mutual-trust-and-06004f2ab334
 
-oc -n test-istio-v3 exec deploy/kiali -c kiali -- cat /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt > service-ca.crt
+# oc -n test-istio-v3 exec deploy/kiali -c kiali -- cat /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt > service-ca.crt
 
-cat root-ca.crt service-ca.crt > custom-ca.crt
-oc create secret generic cacert \
-  --from-file=ca.crt=custom-ca.crt \
-  -n test-istio-v3
+# cat root-ca.crt service-ca.crt > custom-ca.crt
+# oc create secret generic cacert \
+#  --from-file=ca.crt=custom-ca.crt \
+#  -n test-istio-v3
 
 # 0. Prerequisitos
 ## - Tener creado un TempoStack para guardar las trazas (carpeta tempo)
